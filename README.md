@@ -6,7 +6,7 @@
 
 - 支持多账号签到
 - 自动获取并合并订阅链接
-- 使用 Server 酱进行消息推送
+- 使用 [Server 酱](https://sct.ftqq.com/r/13569) 进行消息推送
 - 支持 GitHub Actions 自动运行
 
 ## 使用方法
@@ -33,7 +33,7 @@
 }
 ```
 
-- `SCKEY`：Server 酱的 SCKEY（可选）
+- `SCKEY`：[Server 酱](https://sct.ftqq.com/r/13569) 的 SCKEY（可选）
 - `accounts`：包含多个账号信息的数组
   - `url`：机场网站的 URL
   - `email`：登录邮箱
@@ -48,7 +48,7 @@ pip install requests beautifulsoup4
 ### 3. 运行脚本
 
 ```bash
-python main.py
+python checkin.py
 ```
 
 ## GitHub Actions 自动运行
@@ -63,6 +63,7 @@ python main.py
 - 请确保您的配置文件格式正确，且包含所有必要信息。
 - 使用 GitHub Actions 时，请遵守相关服务条款和使用规范。
 - 本脚本仅用于学习和研究目的，请勿用于非法用途。
+- 如果您想使用 [Server 酱](https://sct.ftqq.com/r/13569) 进行消息推送，请先注册并获取 SCKEY。
 
 ## 致谢
 
