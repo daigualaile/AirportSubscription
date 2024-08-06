@@ -1,9 +1,37 @@
+import configparser
+
 import requests
 import json
 from bs4 import BeautifulSoup
 import urllib.parse
 import os
 import sys
+
+config = {
+    "accounts": [
+        {
+            "url": "https://sstank.top",
+            "email": "iheng13606@gmail.com",
+            "passwd": "123456789"
+        },
+        {
+            "url": "https://sstank.top",
+            "email": "lfa396742@hotmail.com",
+            "passwd": "123456789"
+        },
+        {
+            "url": "https://sstank.top",
+            "email": "lfa396742@hotmail.com",
+            "passwd": "123456789"
+        },{
+            "url": "https://www.wiougong.club",
+            "email": "1269305589@hotmail.com",
+            "passwd": "123456789"
+        }
+    ],
+    "SCKEY": "SCT254791TjCrYi7Be26N0a6IQhhiOe68z"
+}
+
 
 def load_config():
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -13,10 +41,14 @@ def load_config():
             return json.load(f)
     except FileNotFoundError:
         print(f"错误: 配置文件未找到。路径: {config_path}")
-        sys.exit(1)
+        # sys.exit(1)
+        return config
     except json.JSONDecodeError as e:
         print(f"错误: 配置文件格式不正确。详细信息: {str(e)}")
-        sys.exit(1)
+        return config
+        # sys.exit(1)
+
+
 
 def checkin(account):
     session = requests.session()
