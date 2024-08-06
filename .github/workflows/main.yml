@@ -40,6 +40,18 @@ jobs:
         run: |
           echo "$CONFIG" > config.json
 
+      - name: Check config file
+        run: |
+          ls -l config.json
+          file config.json
+
       - name: Run sign
         run: |
           python3 ./main.py
+
+      - name: Output run logs
+        if: always()
+        run: |
+          echo "=== Script Output ==="
+          cat output.log
+        continue-on-error: true

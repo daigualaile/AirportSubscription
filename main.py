@@ -2,11 +2,21 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import urllib.parse
+import os
+import sys
 
 def load_config():
-    with open('config.json', 'r') as f:
-        return json.load(f)
-
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(script_dir, 'config.json')
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"错误: 配置文件未找到。路径: {config_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"错误: 配置文件格式不正确。详细信息: {str(e)}")
+        sys.exit(1)
 
 def checkin(account):
     session = requests.session()
@@ -29,15 +39,20 @@ def checkin(account):
 
     try:
         print(f'正在为账号 {email} 进行登录...')
-        response = json.loads(session.post(url=login_url, headers=header, data=data).text)
-        print(response['msg'])
+        response = session.post(url=login_url, headers=header, data=data)
+        response.raise_for_status()
+        response_data = response.json()
+        print(response_data['msg'])
 
         # 进行签到
-        result = json.loads(session.post(url=check_url, headers=header).text)
-        print(result['msg'])
+        result = session.post(url=check_url, headers=header)
+        result.raise_for_status()
+        result_data = result.json()
+        print(result_data['msg'])
 
         # 获取用户页面并解析订阅链接
         user_page = session.get(url=user_url, headers=header)
+        user_page.raise_for_status()
         soup = BeautifulSoup(user_page.text, 'html.parser')
         sub_link = soup.find('a', {'data-clipboard-text': True})
         if sub_link:
@@ -47,17 +62,16 @@ def checkin(account):
             subscription_url = ""
             print("未找到订阅链接")
 
-        return f"账号 {email}: {result['msg']}", subscription_url
-    except Exception as e:
+        return f"账号 {email}: {result_data['msg']}", subscription_url
+    except requests.RequestException as e:
         error_msg = f"账号 {email} 操作失败: {str(e)}"
         print(error_msg)
         return error_msg, ""
 
 def merge_subscriptions(subscription_urls):
-    # 使用 subconverter 服务合并订阅链接
     subconverter_url = "https://sub.xeton.dev/sub"
     params = {
-        'target': 'clash',  # 可以根据需要更改目标格式
+        'target': 'clash',
         'url': '|'.join(subscription_urls),
         'insert': 'false',
         'config': 'https://raw.githubusercontent.com/ACL4SSR/ACL4SSR/master/Clash/config/ACL4SSR_Online.ini',
@@ -69,15 +83,18 @@ def merge_subscriptions(subscription_urls):
         'fdn': 'false',
         'sort': 'false'
     }
-    response = requests.get(subconverter_url, params=params)
-    if response.status_code == 200:
+    try:
+        response = requests.get(subconverter_url, params=params)
+        response.raise_for_status()
         return response.url
-    else:
+    except requests.RequestException as e:
+        print(f"合并订阅失败: {str(e)}")
         return "合并订阅失败"
 
 def main():
+    print("开始执行签到脚本...")
     config = load_config()
-    SCKEY = config['SCKEY']
+    SCKEY = config.get('SCKEY')
 
     all_results = []
     subscription_urls = []
@@ -98,9 +115,13 @@ def main():
 
     # 进行推送
     if SCKEY:
-        push_url = f'https://sctapi.ftqq.com/{SCKEY}.send?title=机场签到&desp={urllib.parse.quote(content)}'
-        requests.post(url=push_url)
-        print('推送成功')
+        try:
+            push_url = f'https://sctapi.ftqq.com/{SCKEY}.send?title=机场签到&desp={urllib.parse.quote(content)}'
+            response = requests.post(url=push_url)
+            response.raise_for_status()
+            print('推送成功')
+        except requests.RequestException as e:
+            print(f'推送失败: {str(e)}')
     else:
         print('未配置 SCKEY，跳过推送')
 
