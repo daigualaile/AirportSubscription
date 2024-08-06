@@ -29,7 +29,6 @@ def checkin(account):
     try:
         print(f'正在为账号 {email} 进行登录...')
         response = json.loads(session.post(url=login_url, headers=header, data=data).text)
-        print(response)
         print(response['msg'])
 
         # 进行签到
