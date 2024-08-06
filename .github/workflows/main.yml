@@ -1,4 +1,4 @@
-name: "Common airport Checkin"
+name: "Common Airport Checkin"
 
 on:
   push:
@@ -34,11 +34,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run sign
+      - name: Create config file
         env:
-          URL: ${{ secrets.URL }}
-          SCKEY: ${{ secrets.SCKEY }}
-          EMAIL: ${{ secrets.EMAIL }}
-          PASSWD: ${{ secrets.PASSWD }}
+          CONFIG: ${{ secrets.CONFIG }}
+        run: |
+          echo "$CONFIG" > config.json
+
+      - name: Run sign
         run: |
           python3 ./main.py
