@@ -7,6 +7,7 @@ def load_config():
     with open('config.json', 'r') as f:
         return json.load(f)
 
+
 def checkin(account):
     session = requests.session()
     url = account['url']
