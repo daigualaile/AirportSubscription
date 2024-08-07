@@ -30,18 +30,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create and check config file
-        env:
-          CONFIG: ${{ secrets.CONFIG }}
-        run: |
-          echo "$CONFIG" > config.json
-          echo "Config file contents (first 10 lines):"
-          head -n 10 config.json
-          echo "---"
-          echo "Is config.json valid JSON?"
-          python -c "import json; json.load(open('config.json'))" && echo "Yes, it's valid JSON" || echo "No, it's not valid JSON"
-
       - name: Run sign
+        env:
+          ACCOUNTS: ${{ secrets.ACCOUNTS }}
+          SCKEY: ${{ secrets.SCKEY }}
         run: |
           python3 ./main.py
 

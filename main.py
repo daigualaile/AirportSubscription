@@ -1,53 +1,26 @@
-import configparser
-
+import sys
 import requests
 import json
 from bs4 import BeautifulSoup
 import urllib.parse
 import os
-import sys
-
-config = {
-    "accounts": [
-        {
-            "url": "https://sstank.top",
-            "email": "iheng13606@gmail.com",
-            "passwd": "123456789"
-        },
-        {
-            "url": "https://sstank.top",
-            "email": "lfa396742@hotmail.com",
-            "passwd": "123456789"
-        },
-        {
-            "url": "https://sstank.top",
-            "email": "lfa396742@hotmail.com",
-            "passwd": "123456789"
-        },{
-            "url": "https://www.wiougong.club",
-            "email": "1269305589@hotmail.com",
-            "passwd": "123456789"
-        }
-    ],
-    "SCKEY": "SCT254791TjCrYi7Be26N0a6IQhhiOe68z"
-}
 
 
 def load_config():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.join(script_dir, 'config.json')
+    accounts_json = os.environ.get('ACCOUNTS', '[]')
+    if not accounts_json:
+        print("警告: ACCOUNTS 环境变量为空")
     try:
-        with open(config_path, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print(f"错误: 配置文件未找到。路径: {config_path}")
-        # sys.exit(1)
-        return config
-    except json.JSONDecodeError as e:
-        print(f"错误: 配置文件格式不正确。详细信息: {str(e)}")
-        return config
-        # sys.exit(1)
+        accounts = json.loads(accounts_json)
+    except json.JSONDecodeError:
+        print("错误: ACCOUNTS 环境变量格式不正确")
+        accounts = []
 
+    config = {
+        "accounts": accounts,
+        "SCKEY": os.environ.get('SCKEY', '')
+    }
+    return config
 
 
 def checkin(account):
@@ -100,6 +73,7 @@ def checkin(account):
         print(error_msg)
         return error_msg, ""
 
+
 def merge_subscriptions(subscription_urls):
     subconverter_url = "https://sub.xeton.dev/sub"
     params = {
@@ -122,6 +96,7 @@ def merge_subscriptions(subscription_urls):
     except requests.RequestException as e:
         print(f"合并订阅失败: {str(e)}")
         return "合并订阅失败"
+
 
 def main():
     print("开始执行签到脚本...")
@@ -160,5 +135,8 @@ def main():
     print("所有账号签到完成")
     print(content)
 
+
 if __name__ == "__main__":
+    sys.stdout = open('output.log', 'w')
     main()
+    sys.stdout.close()
