@@ -8,7 +8,7 @@ import os
 
 def load_config():
     accounts_json = os.environ.get('ACCOUNTS', '[]')
-    print(accounts_json)
+    print("accounts:"+accounts_json)
     if not accounts_json:
         print("警告: ACCOUNTS 环境变量为空")
     try:
